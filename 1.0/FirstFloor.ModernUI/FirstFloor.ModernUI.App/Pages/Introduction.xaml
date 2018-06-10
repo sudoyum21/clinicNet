@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="FirstFloor.ModernUI.App.Pages.Introduction"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:app="clr-namespace:FirstFloor.ModernUI.App"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    
+    <Grid Style="{StaticResource ContentRoot}">
+        <ScrollViewer>
+            <StackPanel >
+                <StackPanel.Resources>
+                    <PathGeometry x:Key="HomeIconData">F1 M 15.0021,35.0049L 15.0021,33.0046L 15.0021,24.2034L 14.002,25.0035L 12.0017,22.0031L 24.0033,13.0018L 29.004,16.7523L 29.004,14.002L 31.0043,13.502L 31.0043,18.2525L 36.005,22.0031L 34.0047,25.0035L 33.0046,24.2034L 33.0046,33.0046L 33.0046,35.0049L 15.0021,35.0049 Z M 24.0033,17.0024L 17.0024,22.6032L 17.0024,33.0046L 21.0029,33.0046L 21.0029,27.0038L 27.0038,27.0038L 27.0038,33.0046L 31.0043,33.0046L 31.0043,22.6032L 24.0033,17.0024 Z</PathGeometry>
+                </StackPanel.Resources>
+                <StackPanel.DataContext>
+                    <app:SampleFormViewModel />
+                </StackPanel.DataContext>
+                <!--<TextBlock Text="Clinic name goes here" Style="{StaticResource Heading1}" Margin="0,0,0,8"/>
+                <mui:BBCodeBlock BBCode="Control management goes here" Margin="0,0,0,32" />
+                <mui:ModernButton   IconData="{StaticResource HomeIconData}" Margin="0,0,0,8" >
+                 
+                </mui:ModernButton>
+                <mui:BBCodeBlock xml:space="preserve">» navigate to the [url=/Pages/LayoutBasic.xaml]Fill form[/url]
+» navigate to [url=http://www.google.com]http://www.google.com[/url] in the default browser
+» send an email to [url=mailto:foo@test.com?subject=This%20is%20the%20subject&amp;body=This%20is%20the%20body]foo@test.com[/url]
+                </mui:BBCodeBlock>
+                --><!--<mui:ModernWindow.TitleLinks>
+                    <mui:Link DisplayName="Link to clinic" Source="https://www.google.com"/>
+                </mui:ModernWindow.TitleLinks>--><!--
+      
+                <StackPanel HorizontalAlignment="Left">
+                    <DatePicker Margin="0,0,0,8" />
+                </StackPanel>
+                <TextBlock Text="File" Style="{StaticResource Heading2}" Margin="0,0,0,8" />-->
+                <StackPanel>
+                    <Label Content="First name" Target="{Binding ElementName=TextFirstName}"/>
+                    <TextBox x:Name="TextFirstName" Width="120" Text="{Binding FirstName, Mode=TwoWay, ValidatesOnDataErrors=True}" >
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding FirstNameInvalid}"
+                                 Value="True">
+                                        <Setter Property="BorderBrush" Value="Red"/>
+                                        <Setter Property="Background" Value="Red" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <!--<RadioButton Margin="8,0,0,0" Command="{Binding Path=InvalidCommand}" CommandParameter="firstname" />-->
+                    <!--<CheckBox Margin="8,0,0,0" IsChecked="{Binding FirstNameInvalid, Mode=TwoWay}" />-->
+                </StackPanel>
+                <StackPanel>
+                    <Label Content="Last name" Target="{Binding ElementName=TextLastName}"/>
+                    <TextBox x:Name="TextLastName" Width="120" Text="{Binding LastName, Mode=TwoWay, ValidatesOnDataErrors=True}" >
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LastNameInvalid}"
+                                 Value="True">
+                                        <Setter Property="BorderBrush" Value="Red"/>
+                                        <Setter Property="Background" Value="Red" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <!--<RadioButton Margin="8,0,0,0" Command="{Binding Path=InvalidCommand}" CommandParameter="firstname" />-->
+                    <!--<CheckBox Margin="8,0,0,0" IsChecked="{Binding FirstNameInvalid, Mode=TwoWay}" />-->
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Left" Width="140">
+                    <Button Content="Utilisateur" Margin="0,10,0,0" Command="{Binding ChangeUserCommand}" Click="ChangeUser_Click" />
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
