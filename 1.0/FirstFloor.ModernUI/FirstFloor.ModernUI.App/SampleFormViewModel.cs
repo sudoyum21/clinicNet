@@ -28,7 +28,7 @@ namespace FirstFloor.ModernUI.App
         private string _ddn = "";
 
         private string _user = "";
-
+        private string _invalidPages = "";
         //private string _firstName = "";
         //private string _lastName = "";
         //private string _address = "";
@@ -46,8 +46,7 @@ namespace FirstFloor.ModernUI.App
         private bool _ddnInvalid = false;
 
         private int _pageNumber = 1;
-        private ICommand _previousCommand, _nextCommand, _saveCommand, _openAdminCommand, _saveAdminCommand, _clearAdminCommand;
-
+        private ICommand _previousCommand, _nextCommand, _saveCommand, _openAdminCommand, _saveAdminCommand, _clearAdminCommand, _validCommand;
         
         public ICommand ClearAdminCommand
         {
@@ -128,11 +127,24 @@ namespace FirstFloor.ModernUI.App
                 return _previousCommand;
             }
         }
+        public ICommand ValidateCommand
+        {
+            get
+            {
+                if (_validCommand == null)
+                {
+                    _validCommand = new RelayCommand(
+                        param => this.Validate()
+                    );
+                }
+                return _validCommand;
+            }
+        }
         public SampleFormViewModel()
         {
             _data = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
         }
-        private void SaveObjectAndGoNext(bool admin = false)
+        public void SaveObjectAndGoNext(bool admin = false)
         {
             _data = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
             _data.SetInvalid(LastNameInvalid, FirstNameInvalid, AddressInvalid, CodePostalInvalid, PhoneInvalid, NasInvalid, NamInvalid, SpokenInvalid
@@ -169,6 +181,67 @@ namespace FirstFloor.ModernUI.App
         private void GoNext()
         {         
             GetForm(true);
+        }
+        private void Validate()
+        {
+            FormModel formOriginal = null, formToCheck;
+            int idx = 1;
+            string prefix = @".\";
+            prefix += User;
+            string fileName = prefix + "\\" + PageNumber;
+            fileName += "original_";      
+            fileName += ".txt";
+            try
+            {
+                // deserialize JSON directly from a file
+                using (StreamReader file = File.OpenText(fileName))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    formOriginal = (FormModel)serializer.Deserialize(file, typeof(FormModel));
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            if(formOriginal != null)
+            {
+                for (int i = 1; i < 67; ++i)
+                {
+                    prefix = @".\";
+                    prefix += User;
+                    fileName = prefix + "\\" + PageNumber;
+                    fileName += ".txt";
+                    try
+                    {
+                        // deserialize JSON directly from a file
+                        using (StreamReader file = File.OpenText(fileName))
+                        {
+                            JsonSerializer serializer = new JsonSerializer();
+                            formToCheck = (FormModel)serializer.Deserialize(file, typeof(FormModel));
+
+                            formToCheck.addressInvalid = formToCheck.address != formOriginal.address;
+                            formToCheck.codePostalInvalid = formToCheck.codePostal != formOriginal.codePostal;
+                            formToCheck.ddnInvalid = formToCheck.ddn != formOriginal.ddn;
+                            formToCheck.firstNameInvalid = formToCheck.firstName != formOriginal.firstName;
+                            formToCheck.lastNameInvalid = formToCheck.lastName != formOriginal.lastName;
+                            formToCheck.namInvalid = formToCheck.nam != formOriginal.nam;
+                            formToCheck.nasInvalid = formToCheck.nas != formOriginal.nas;
+                            formToCheck.phoneInvalid = formToCheck.phone != formOriginal.phone;
+                            formToCheck.spokenInvalid = formToCheck.spoken != formOriginal.spoken;
+                            formToCheck.writtenInvalid = formToCheck.written != formOriginal.written;
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+            }
+            
+            
         }
         private void GetForm(bool goNext, int pageNo = 0, bool admin = false)
         {
@@ -299,6 +372,18 @@ namespace FirstFloor.ModernUI.App
                 {
                     this._pageNumber = value;
                     OnPropertyChanged("PageNumber");
+                }
+            }
+        }
+        public string InvalidPages
+        {
+            get { return this._invalidPages; }
+            set
+            {
+                if (this._invalidPages != value)
+                {
+                    this._invalidPages = value;
+                    OnPropertyChanged("InvalidPages");
                 }
             }
         }
@@ -606,7 +691,7 @@ namespace FirstFloor.ModernUI.App
                 return null;
             }
         }
-        private class FormModel
+        public class FormModel
         {
             Dictionary<string, bool> _invalidValues = new Dictionary<string, bool>();
 
