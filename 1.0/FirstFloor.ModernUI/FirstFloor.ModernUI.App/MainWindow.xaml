@@ -4,7 +4,7 @@
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   xmlns:app="clr-namespace:FirstFloor.ModernUI.App"
                   Title="Form Fill Validation" IsTitleVisible="True"
-                  
+                  WindowState="Maximized"
                   ContentSource="/Pages/LayoutSplit.xaml"
                   Width="1200" Height="700">
 

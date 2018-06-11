@@ -7,11 +7,15 @@
                xmlns:page="clr-namespace:FirstFloor.ModernUI.App.Pages"
                           xmlns:app="clr-namespace:FirstFloor.ModernUI.App"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="900">
+             >
     <Grid>
+        <Grid.DataContext>
+            <app:SampleFormViewModel />
+        </Grid.DataContext>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="6"/>
+            <ColumnDefinition Width="15"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -26,10 +30,7 @@
                 <StackPanel x:Name="Form" Orientation="Vertical">
 
 
-                    <!-- create viewmodel -->
-                    <StackPanel.DataContext>
-                        <app:SampleFormViewModel />
-                    </StackPanel.DataContext>
+   
 
                     <StackPanel.Resources>
                         <Style TargetType="StackPanel">
@@ -52,7 +53,7 @@
                         <TextBlock Text="{Binding PageNumber, Mode=TwoWay}" Style="{StaticResource Heading2}" x:Name="TextPageNumber" Margin="0,0,0,8" />
                     </StackPanel>
                     <StackPanel>
-                        <Label Content="Nom" Target="{Binding ElementName=TextFirstName}"/>
+                        <Label Content="Prenom" Target="{Binding ElementName=TextFirstName}"/>
                         <TextBox x:Name="TextFirstName" Width="150" Text="{Binding FirstName, Mode=TwoWay }" >
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
@@ -70,7 +71,7 @@
                         <!--<CheckBox Margin="8,0,0,0" IsChecked="{Binding FirstNameInvalid, Mode=TwoWay}" />-->
                     </StackPanel>
                     <StackPanel>
-                        <Label Content="Prenom" Target="{Binding ElementName=TextLastName}"/>
+                        <Label Content="Nom" Target="{Binding ElementName=TextLastName}"/>
                         <TextBox x:Name="TextLastName" Width="150" Text="{Binding LastName, Mode=TwoWay }">
 
                             <TextBox.Style>
@@ -330,7 +331,10 @@
             </StackPanel>
         </ScrollViewer>
         <GridSplitter Grid.Column="1" />
-        <ScrollViewer Grid.Column="2">
+        <StackPanel Grid.Column="3">
+            <Label MinWidth="20"></Label>
+        </StackPanel>
+        <ScrollViewer Grid.Column="4">
             <StackPanel MinWidth="200">
 
 
@@ -341,10 +345,7 @@
                 <StackPanel x:Name="Form2" Orientation="Vertical">
 
 
-                    <!-- create viewmodel -->
-                    <StackPanel.DataContext>
-                        <app:SampleFormViewModel />
-                    </StackPanel.DataContext>
+                
 
                     <StackPanel.Resources>
                         <Style TargetType="StackPanel">
@@ -378,18 +379,18 @@
                     </Label>
                     <StackPanel></StackPanel>
                     <StackPanel></StackPanel>
-                    <!--<StackPanel>
+                    <StackPanel>
                         <Label Content="Page No : " Target="{Binding ElementName=TextPageNumber2}"/>
                         <TextBlock Text="{Binding PageNumber, Mode=TwoWay}" Style="{StaticResource Heading2}" x:Name="TextPageNumber2" Margin="0,0,0,8" />
-                    </StackPanel>-->
+                    </StackPanel>
 
                     <StackPanel>
-                        <Label Content="Nom" Target="{Binding ElementName=TextFirstName}"/>
-                        <TextBox x:Name="TextFirstName2" Width="150" Text="{Binding FirstName, Mode=TwoWay }" >
+                        <Label Content="Prenom" Target="{Binding ElementName=TextFirstName}"/>
+                        <TextBox x:Name="TextFirstName2" Width="150" Text="{Binding FirstName2, Mode=TwoWay }" >
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding FirstNameInvalid}"
+                                        <DataTrigger Binding="{Binding FirstNameInvalid2}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -402,14 +403,38 @@
                         <!--<CheckBox Margin="8,0,0,0" IsChecked="{Binding FirstNameInvalid, Mode=TwoWay}" />-->
                     </StackPanel>
                     <StackPanel>
-                        <Label Content="Prenom" Target="{Binding ElementName=TextLastName2}"/>
-                        <TextBox x:Name="TextLastName2" Width="150" Text="{Binding LastName, Mode=TwoWay }"/>
+                        <Label Content="Nom" Target="{Binding ElementName=TextLastName2}"/>
+                        <TextBox x:Name="TextLastName2" Width="150" Text="{Binding LastName2, Mode=TwoWay }">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding LastNameInvalid2}"
+                                 Value="True">
+                                            <Setter Property="BorderBrush" Value="Red"/>
+                                            <Setter Property="Background" Value="Red" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
                     </StackPanel>
 
 
                     <StackPanel>
                         <Label Content="Addresse" Target="{Binding ElementName=Address2}"/>
-                        <TextBox x:Name="Address2" Text="{Binding Address, Mode=TwoWay }" Width="150" />
+                        <TextBox x:Name="Address2" Text="{Binding Address2, Mode=TwoWay }" Width="150" >
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding AddressInvalid2}"
+                                 Value="True">
+                                            <Setter Property="BorderBrush" Value="Red"/>
+                                            <Setter Property="Background" Value="Red" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
 
                     </StackPanel>
                     <!--<StackPanel>
@@ -436,12 +461,12 @@
                     </StackPanel>-->
                     <StackPanel>
                         <Label Content="Code Postale" Target="{Binding ElementName=TextZipCode2}"/>
-                        <TextBox x:Name="TextZipCode2" Width="150" Text="{Binding CodePostal, Mode=TwoWay }" >
+                        <TextBox x:Name="TextZipCode2" Width="150" Text="{Binding CodePostal2, Mode=TwoWay }" >
 
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CodePostalInvalid}"
+                                        <DataTrigger Binding="{Binding CodePostalInvalid2}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -455,12 +480,12 @@
                     </StackPanel>
                     <StackPanel>
                         <Label Content="Telephone " Target="{Binding ElementName=TextTelephone2}"/>
-                        <TextBox x:Name="TextTelephone2" Width="150" Text="{Binding Phone, Mode=TwoWay }" >
+                        <TextBox x:Name="TextTelephone2" Width="150" Text="{Binding Phone2, Mode=TwoWay }" >
 
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding PhoneInvalid}"
+                                        <DataTrigger Binding="{Binding PhoneInvalid2}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -474,12 +499,12 @@
                     </StackPanel>
                     <StackPanel>
                         <Label Content="DDN" Target="{Binding ElementName=TextDdn2}" />
-                        <TextBox x:Name="TextDdn2" Width="150" Text="{Binding Ddn, Mode=TwoWay }" >
+                        <TextBox x:Name="TextDdn2" Width="150" Text="{Binding Ddn2, Mode=TwoWay }" >
 
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DdnInvalid}"
+                                        <DataTrigger Binding="{Binding DdnInvalid2}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -507,12 +532,12 @@
                     </StackPanel>
                     <StackPanel>
                         <Label Content="NAS " Target="{Binding ElementName=TextNas2}"/>
-                        <TextBox x:Name="TextNas2" Width="150" Text="{Binding Nas, Mode=TwoWay }" >
+                        <TextBox x:Name="TextNas2" Width="150" Text="{Binding Nas2, Mode=TwoWay }" >
 
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding NasInvalid}"
+                                        <DataTrigger Binding="{Binding NasInvalid2}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -526,12 +551,12 @@
                     </StackPanel>
                     <StackPanel>
                         <Label Content="NAM" Target="{Binding ElementName=Nam2}" />
-                        <TextBox x:Name="Nam2"  Width="150" Text="{Binding Nam, Mode=TwoWay }" >
+                        <TextBox x:Name="Nam2"  Width="150" Text="{Binding Nam2, Mode=TwoWay }" >
 
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding NamInvalid}"
+                                        <DataTrigger Binding="{Binding NamInvalid2}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -545,12 +570,12 @@
                     </StackPanel>
                     <StackPanel>
                         <Label Content="Langues Parlées" Target="{Binding ElementName=LSpoken2}" />
-                        <TextBox x:Name="LSpoken2"  Width="150" Text="{Binding Spoken, Mode=TwoWay }">
+                        <TextBox x:Name="LSpoken2"  Width="150" Text="{Binding Spoken2, Mode=TwoWay }">
 
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SpokenInvalid}"
+                                        <DataTrigger Binding="{Binding SpokenInvalid2}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -564,12 +589,12 @@
                     </StackPanel>
                     <StackPanel>
                         <Label Content="Langues Écrites " Target="{Binding ElementName=LWritten2}"/>
-                        <TextBox x:Name="LWritten2" Width="150" Text="{Binding Written, Mode=TwoWay }" >
+                        <TextBox x:Name="LWritten2" Width="150" Text="{Binding Written2, Mode=TwoWay }" >
 
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding WrittenInvalid}"
+                                        <DataTrigger Binding="{Binding WrittenInvalid2}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -583,12 +608,12 @@
                     </StackPanel>
                     <StackPanel>
                         <Label Content="Source de réf" Target="{Binding ElementName=srfRef2}" />
-                        <TextBox x:Name="srfRef2"   Width="150" Text="{Binding SrcRef, Mode=TwoWay }">
+                        <TextBox x:Name="srfRef2"   Width="150" Text="{Binding SrcRef2, Mode=TwoWay }">
 
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SrcRefInvalid}"
+                                        <DataTrigger Binding="{Binding SrcRefInvalid2}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -610,24 +635,26 @@
                     <Button Content="Sauvegarde" Margin="100,16,0,0" HorizontalAlignment="Left" Command="{Binding Path=SaveAdminCommand}" Width="120" />
                     <Button Content="Recommencer" Margin="100,16,0,0" HorizontalAlignment="Left" Command="{Binding Path=ClearAdminCommand}" Width="120"/>
                     <Button Content="Valider" Margin="100,16,0,0" HorizontalAlignment="Left" Command="{Binding Path=ValidateCommand}" Width="120"/>
-                    <TextBlock Text="{Binding InvalidPages, Mode=TwoWay}" Margin="100,16,0,0" >
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding InvalidPagesState}"
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                        <Label Content="{Binding InvalidPages, Mode=TwoWay}" Margin="100,16,0,0" >
+                            <Label.Style>
+                                <Style TargetType="Label">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding InvalidPagesState}"
                                  Value="false">
-                                        <!--<Setter Property="Bo" Value="White"/>-->
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding InvalidPagesState}"
+                                            <!--<Setter Property="Bo" Value="White"/>-->
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding InvalidPagesState}"
                                  Value="true">
-                                        <Setter Property="FontWeight" Value="bold"/>
-                                        <Setter Property="Foreground" Value="red"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <Label Content="By Unblank" FontStyle="Italic" FontSize="14" HorizontalAlignment="Right"  Width="75"/>
+                                            <Setter Property="FontWeight" Value="bold"/>
+                                            <Setter Property="Foreground" Value="red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
+                    </ScrollViewer>
+                    <Label Content="By Unblank" FontStyle="Italic" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>

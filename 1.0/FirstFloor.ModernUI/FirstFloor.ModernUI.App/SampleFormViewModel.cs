@@ -14,10 +14,11 @@ namespace FirstFloor.ModernUI.App
     public class SampleFormViewModel
         : NotifyPropertyChanged, IDataErrorInfo
     {
-        private readonly int MaxPage = 67;
+        private readonly int MaxPage = 4;
         private FormModel _data;
+        private FormModel _data2;
         private string _firstName = "";
-        private string _lastName ="";
+        private string _lastName = "";
         private string _address = "";
         private string _codePostal = "";
         private string _phone = "";
@@ -30,7 +31,22 @@ namespace FirstFloor.ModernUI.App
 
         private string _user = "";
         private string _invalidPages = "";
-        
+
+        private string _firstName2 = "";
+        private string _lastName2 = "";
+        private string _address2 = "";
+        private string _codePostal2 = "";
+        private string _phone2 = "";
+        private string _nas2 = "";
+        private string _nam2 = "";
+        private string _spoken2 = "";
+        private string _written2 = "";
+        private string _srcRef2 = "";
+        private string _ddn2 = "";
+
+        private string _user2 = "";
+        private string _invalidPages2 = "";
+
         //private string _firstName = "";
         //private string _lastName = "";
         //private string _address = "";
@@ -47,9 +63,23 @@ namespace FirstFloor.ModernUI.App
         private bool _srcRefInvalid = false;
         private bool _ddnInvalid = false;
         private bool _invalidPagesState = false;
+
+        private bool _firstNameInvalid2 = false;
+        private bool _lastNameInvalid2 = false;
+        private bool _addressInvalid2 = false;
+        private bool _codePostalInvalid2 = false;
+        private bool _phoneInvalid2 = false;
+        private bool _nasInvalid2 = false;
+        private bool _namInvalid2 = false;
+        private bool _spokenInvalid2 = false;
+        private bool _writtenInvalid2 = false;
+        private bool _srcRefInvalid2 = false;
+        private bool _ddnInvalid2 = false;
+        private bool _invalidPagesState2 = false;
+
         private int _pageNumber = 1;
         private ICommand _previousCommand, _nextCommand, _saveCommand, _openAdminCommand, _saveAdminCommand, _clearAdminCommand, _validCommand;
-
+        private readonly string OriginalName = "original";
 
         public ICommand ClearAdminCommand
         {
@@ -71,11 +101,16 @@ namespace FirstFloor.ModernUI.App
                 if (_openAdminCommand == null)
                 {
                     _openAdminCommand = new RelayCommand(
-                        param => this.GetForm(true,1,true)
+                        param => OpenForm()
                     );
                 }
                 return _openAdminCommand;
             }
+        }
+        public void OpenForm()
+        {
+            this.GetForm(true, false, PageNumber);
+            this.GetForm(true, true, PageNumber);
         }
         public ICommand SaveAdminCommand
         {
@@ -146,62 +181,29 @@ namespace FirstFloor.ModernUI.App
         public SampleFormViewModel()
         {
             _data = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
+            _data2 = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
+            //Mediator.Register("InitOther", InitOther);
+            //Mediator.Register("Next", GoNextAll);
+            //Mediator.Register("Back", GoBackAll);
         }
-        public void SaveObjectAndGoNext(bool admin = false)
+        public void InitOther(object args)
         {
-            _data = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
-            _data.SetInvalid(LastNameInvalid, FirstNameInvalid, AddressInvalid, CodePostalInvalid, PhoneInvalid, NasInvalid, NamInvalid, SpokenInvalid
-                ,WrittenInvalid, SrcRefInvalid, DdnInvalid);
             string prefix = @".\";
-            if (!admin)
-            {
-                User = SingletonUser.user.ToString();
-            }
-            prefix += User;      
-            string fileName = prefix + "\\" + PageNumber;
-            if (admin)
-            {
-                fileName += "original_";
-                //SingletonUser.user = User;
-            }
-            //else
-            //{
-            //    User = SingletonUser.user.ToString();
-            //}
-            fileName += ".txt"; 
-            System.IO.Directory.CreateDirectory(prefix);
-            JsonSerializer serializer = new JsonSerializer();
-            using (StreamWriter sw = new StreamWriter(fileName))
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-                serializer.Serialize(writer, _data);
-            }
-        }
-
-        private void GoBack()
-        {          
-            GetForm(false);
-        }
-        private void GoNext()
-        {         
-            GetForm(true);
-        }
-        private void Validate()
-        {
-            InvalidPages = "";
-            FormModel formOriginal = null, formToCheck = null;
-            string prefix = @".\";
+            User = SingletonUser.user.ToString();
             prefix += User;
             string fileName = prefix + "\\" + PageNumber;
-            fileName += "original_";      
             fileName += ".txt";
+            bool foundForm = false;
             try
             {
                 // deserialize JSON directly from a file
                 using (StreamReader file = File.OpenText(fileName))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    formOriginal = (FormModel)serializer.Deserialize(file, typeof(FormModel));
+                    FormModel form = (FormModel)serializer.Deserialize(file, typeof(FormModel));
+
+                    SetModel(form);
+                    foundForm = true;
                 }
 
             }
@@ -209,16 +211,107 @@ namespace FirstFloor.ModernUI.App
             {
                 Console.WriteLine(e);
             }
-            if(formOriginal != null)
+            finally
             {
-             
-                for (int i = 1; i < MaxPage; ++i)
+                if (!foundForm)
                 {
-                    bool errorPresent = false;
-                    prefix = @".\";
-                    prefix += User;
-                    fileName = prefix + "\\" + i;
-                    fileName += ".txt";
+                    InitFields();
+                }
+            }
+        }
+        public void SaveObjectAndGoNext(bool admin = false)
+        {
+            FormModel data = null;
+            if (!admin)
+            {
+                _data = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
+                _data.SetInvalid(LastNameInvalid, FirstNameInvalid, AddressInvalid, CodePostalInvalid, PhoneInvalid, NasInvalid, NamInvalid, SpokenInvalid
+                    , WrittenInvalid, SrcRefInvalid, DdnInvalid);
+                data = _data;
+            }
+            else
+            {
+                _data2 = new FormModel(LastName2, FirstName2, Address2, CodePostal2, Phone2, Nas2, Nam2, Spoken2, Written2, SrcRef2, Ddn2, User);
+                _data2.SetInvalid(LastNameInvalid2, FirstNameInvalid2, AddressInvalid2, CodePostalInvalid2, PhoneInvalid2, NasInvalid2, 
+                    NamInvalid2, SpokenInvalid2, WrittenInvalid2, SrcRefInvalid2, DdnInvalid2);
+                data = _data2;
+            }
+
+            string prefix = @".\";
+            if (!admin)
+            {
+                User = SingletonUser.user.ToString();
+            }
+            prefix += User;
+            string fileName = prefix + "\\" + PageNumber;
+            if (admin)
+            {
+                fileName += OriginalName;
+                //SingletonUser.user = User;
+            }
+            //else
+            //{
+            //    User = SingletonUser.user.ToString();
+            //}
+            fileName += ".txt";
+            System.IO.Directory.CreateDirectory(prefix);
+            JsonSerializer serializer = new JsonSerializer();
+            using (StreamWriter sw = new StreamWriter(fileName))
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                serializer.Serialize(writer, data);
+            }
+        }
+
+        private void GoBack()
+        {
+            //Mediator.NotifyColleagues("Back", "");
+            GetForm(false);
+            GetForm(false,true, PageNumber);
+        }
+        private void GoNext()
+        {
+            //Mediator.NotifyColleagues("Next", "");
+            GetForm(true);
+            GetForm(true,true, PageNumber);
+        }
+        private void Validate()
+        {
+            InvalidPages = "";
+
+
+
+
+            for (int i = 1; i < MaxPage; ++i)
+            {
+                FormModel formOriginal = null, formToCheck = null;
+                string prefix = @".\";
+                prefix += User;
+                string fileName = prefix + "\\" + i;
+                fileName += OriginalName;
+                fileName += ".txt";
+                try
+                {
+                    // deserialize JSON directly from a file
+                    using (StreamReader file = File.OpenText(fileName))
+                    {
+                        JsonSerializer serializer = new JsonSerializer();
+                        formOriginal = (FormModel)serializer.Deserialize(file, typeof(FormModel));
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                bool errorPresent = false;
+                bool foundFile = false;
+                prefix = @".\";
+                prefix += User;
+                fileName = prefix + "\\" + i;
+                fileName += ".txt";
+                if (formOriginal != null)
+                {
                     try
                     {
                         // deserialize JSON directly from a file
@@ -249,6 +342,7 @@ namespace FirstFloor.ModernUI.App
                             errorPresent |= formToCheck.writtenInvalid;
                             formToCheck.srcRefInvalid = formToCheck.srcRef != formOriginal.srcRef;
                             errorPresent |= formToCheck.srcRefInvalid;
+                            foundFile = true;
                         }
 
                     }
@@ -259,14 +353,15 @@ namespace FirstFloor.ModernUI.App
                     }
                     if (errorPresent)
                     {
-                        if(InvalidPages == "")
+                        if (InvalidPages == "")
                         {
                             InvalidPages = "Pages : ";
                         }
-                        if(i < MaxPage-1)
+                        if (i < MaxPage - 1)
                         {
                             InvalidPages += i + " | ";
-                        } else
+                        }
+                        else
                         {
                             InvalidPages += i;
                         }
@@ -284,37 +379,44 @@ namespace FirstFloor.ModernUI.App
                     }
                     else
                     {
-                        
+
                     }
-                    string pr = @".\";
-                    pr += User;
-                    string fn = pr + "\\" + i;
-                    fn += ".txt";
-                    System.IO.Directory.CreateDirectory(prefix);
-                    JsonSerializer serializer2 = new JsonSerializer();
-                    using (StreamWriter sw = new StreamWriter(fileName))
-                    using (JsonWriter writer = new JsonTextWriter(sw))
+                    if (foundFile)
                     {
-                        serializer2.Serialize(writer, formToCheck);
+                        string pr = @".\";
+                        pr += User;
+                        string fn = pr + "\\" + i;
+                        fn += ".txt";
+                        System.IO.Directory.CreateDirectory(prefix);
+                        JsonSerializer serializer2 = new JsonSerializer();
+                        using (StreamWriter sw = new StreamWriter(fileName))
+                        using (JsonWriter writer = new JsonTextWriter(sw))
+                        {
+                            serializer2.Serialize(writer, formToCheck);
+                        }
                     }
+
                 }
+
             }
-            
-            
+            //Mediator.NotifyColleagues("Try1", "Hello World");
+            OpenForm();
         }
 
-        private void GetForm(bool goNext, int pageNo = 0, bool admin = false)
+        private void GetForm(bool goNext, bool admin = false, int pageNo = 0)
         {
-            InitFields();
-            if(pageNo > 0)
-            {
-                PageNumber = pageNo;
-            }
-            else
+            int idxPage = pageNo;
+            InitFields(admin);
+            //if(pageNo > 0)
+            //{
+            //    PageNumber = pageNo;
+            //}
+            //else
+            if (!admin && pageNo == 0)
             {
                 if (goNext)
                 {
-                    if (PageNumber < MaxPage-1)
+                    if (PageNumber < MaxPage - 1)
                     {
                         ++PageNumber;
                     }
@@ -327,19 +429,20 @@ namespace FirstFloor.ModernUI.App
                         --PageNumber;
                     }
                 }
-            }
+                idxPage = PageNumber;
+            } 
             string prefix = @".\";
             if (!admin)
             {
-               User = SingletonUser.user.ToString();
-            } 
+                User = SingletonUser.user.ToString();
+            }
             prefix += User;
-            string fileName = prefix + "\\" + PageNumber;
+            string fileName = prefix + "\\" + idxPage;
             if (admin)
             {
-                fileName += "original_";
+                fileName += OriginalName;
                 //SingletonUser.user = User.ToString();
-            } 
+            }
             fileName += ".txt";
             bool foundForm = false;
             try
@@ -349,11 +452,11 @@ namespace FirstFloor.ModernUI.App
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     FormModel form = (FormModel)serializer.Deserialize(file, typeof(FormModel));
-       
-                    SetModel(form);
+
+                    SetModel(form, admin);
                     foundForm = true;
                 }
- 
+
             }
             catch (Exception e)
             {
@@ -371,63 +474,116 @@ namespace FirstFloor.ModernUI.App
         {
             bool valueBool = false;
             string valueStr = "";
-            FirstName = valueStr;
-            LastName = valueStr;
-            Address = valueStr;
-            CodePostal = valueStr;
-            Phone = valueStr;
-            Nas = valueStr;
-            Nam = valueStr;
-            Spoken = valueStr;
-            Written = valueStr;
-            SrcRef = valueStr;
-            Ddn = valueStr;
-            InvalidPages = valueStr;
-            //User = valueStr;
-            //if (admin)
-            //{
-            //    SingletonUser.user = User;
-            //}
+            if (admin)
+            {
+                FirstName2 = valueStr;
+                LastName2 = valueStr;
+                Address2 = valueStr;
+                CodePostal2 = valueStr;
+                Phone2 = valueStr;
+                Nas2 = valueStr;
+                Nam2 = valueStr;
+                Spoken2 = valueStr;
+                Written2 = valueStr;
+                SrcRef2 = valueStr;
+                Ddn2 = valueStr;
 
+                FirstNameInvalid2 = valueBool;
+                LastNameInvalid2 = valueBool;
+                AddressInvalid2 = valueBool;
+                CodePostalInvalid2 = valueBool;
+                PhoneInvalid2 = valueBool;
+                NasInvalid2 = valueBool;
+                NamInvalid2 = valueBool;
+                SpokenInvalid2 = valueBool;
+                WrittenInvalid2 = valueBool;
+                SrcRefInvalid2 = valueBool;
+                DdnInvalid2 = valueBool;
+            }
+            else
+            {
+                FirstName = valueStr;
+                LastName = valueStr;
+                Address = valueStr;
+                CodePostal = valueStr;
+                Phone = valueStr;
+                Nas = valueStr;
+                Nam = valueStr;
+                Spoken = valueStr;
+                Written = valueStr;
+                SrcRef = valueStr;
+                Ddn = valueStr;
 
-            FirstNameInvalid = valueBool;
-            LastNameInvalid = valueBool;
-            AddressInvalid = valueBool;
-            CodePostalInvalid = valueBool;
-            PhoneInvalid = valueBool;
-            NasInvalid = valueBool;
-            NamInvalid = valueBool;
-            SpokenInvalid = valueBool;
-            WrittenInvalid = valueBool;
-            SrcRefInvalid = valueBool;
-            DdnInvalid = valueBool;
+                FirstNameInvalid = valueBool;
+                LastNameInvalid = valueBool;
+                AddressInvalid = valueBool;
+                CodePostalInvalid = valueBool;
+                PhoneInvalid = valueBool;
+                NasInvalid = valueBool;
+                NamInvalid = valueBool;
+                SpokenInvalid = valueBool;
+                WrittenInvalid = valueBool;
+                SrcRefInvalid = valueBool;
+                DdnInvalid = valueBool;
+            }
         }
-        private void SetModel(FormModel form)
+        private void SetModel(FormModel form, bool admin = false)
         {
-            FirstName = form.firstName;
-            LastName = form.lastName;
-            Address = form.address;
-            CodePostal = form.codePostal;
-            Phone = form.phone;
-            Nas = form.nas;
-            Nam = form.nam;          
-            Spoken = form.spoken;
-            Written = form.written;
-            SrcRef = form.srcRef;
-            Ddn = form.ddn;
-            //User = form.user;
+            if (admin)
+            {
+                FirstName2 = form.firstName;
+                LastName2 = form.lastName;
+                Address2 = form.address;
+                CodePostal2 = form.codePostal;
+                Phone2 = form.phone;
+                Nas2 = form.nas;
+                Nam2 = form.nam;
+                Spoken2 = form.spoken;
+                Written2 = form.written;
+                SrcRef2 = form.srcRef;
+                Ddn2 = form.ddn;
+                //User = form.user;
 
-            FirstNameInvalid = form.firstNameInvalid;
-            LastNameInvalid = form.lastNameInvalid;
-            AddressInvalid = form.addressInvalid;
-            CodePostalInvalid = form.codePostalInvalid;
-            PhoneInvalid = form.phoneInvalid;
-            NasInvalid = form.nasInvalid;
-            NamInvalid = form.namInvalid;
-            SpokenInvalid = form.spokenInvalid;
-            WrittenInvalid = form.writtenInvalid;
-            SrcRefInvalid = form.srcRefInvalid;
-            DdnInvalid = form.ddnInvalid;
+                FirstNameInvalid2 = form.firstNameInvalid;
+                LastNameInvalid2 = form.lastNameInvalid;
+                AddressInvalid2 = form.addressInvalid;
+                CodePostalInvalid2 = form.codePostalInvalid;
+                PhoneInvalid2 = form.phoneInvalid;
+                NasInvalid2 = form.nasInvalid;
+                NamInvalid2 = form.namInvalid;
+                SpokenInvalid2 = form.spokenInvalid;
+                WrittenInvalid2 = form.writtenInvalid;
+                SrcRefInvalid2 = form.srcRefInvalid;
+                DdnInvalid2 = form.ddnInvalid;
+            }
+            else
+            {
+                FirstName = form.firstName;
+                LastName = form.lastName;
+                Address = form.address;
+                CodePostal = form.codePostal;
+                Phone = form.phone;
+                Nas = form.nas;
+                Nam = form.nam;
+                Spoken = form.spoken;
+                Written = form.written;
+                SrcRef = form.srcRef;
+                Ddn = form.ddn;
+                //User = form.user;
+
+                FirstNameInvalid = form.firstNameInvalid;
+                LastNameInvalid = form.lastNameInvalid;
+                AddressInvalid = form.addressInvalid;
+                CodePostalInvalid = form.codePostalInvalid;
+                PhoneInvalid = form.phoneInvalid;
+                NasInvalid = form.nasInvalid;
+                NamInvalid = form.namInvalid;
+                SpokenInvalid = form.spokenInvalid;
+                WrittenInvalid = form.writtenInvalid;
+                SrcRefInvalid = form.srcRefInvalid;
+                DdnInvalid = form.ddnInvalid;
+            }
+
         }
         public int PageNumber
         {
@@ -705,7 +861,7 @@ namespace FirstFloor.ModernUI.App
             {
                 if (this._nam != value)
                 {
-                    this._nam = value; 
+                    this._nam = value;
                     OnPropertyChanged("Nam");
                 }
             }
@@ -747,6 +903,281 @@ namespace FirstFloor.ModernUI.App
                 {
                     this._srcRef = value;
                     OnPropertyChanged("SrcRef");
+                }
+            }
+        }
+
+
+
+        public bool LastNameInvalid2
+        {
+            get { return this._lastNameInvalid2; }
+            set
+            {
+                if (this._lastNameInvalid2 != value)
+                {
+                    this._lastNameInvalid2 = value;
+                    OnPropertyChanged("LastNameInvalid2");
+                }
+            }
+        }
+        public bool FirstNameInvalid2
+        {
+            get { return this._firstNameInvalid2; }
+            set
+            {
+                if (this._firstNameInvalid2 != value)
+                {
+                    this._firstNameInvalid2 = value;
+                    OnPropertyChanged("FirstNameInvalid2");
+                }
+            }
+        }
+        public bool AddressInvalid2
+        {
+            get { return this._addressInvalid2; }
+            set
+            {
+                if (this._addressInvalid2 != value)
+                {
+                    this._addressInvalid2 = value;
+                    OnPropertyChanged("AddressInvalid2");
+                }
+            }
+        }
+        public bool CodePostalInvalid2
+        {
+            get { return this._codePostalInvalid2; }
+            set
+            {
+                if (this._codePostalInvalid2 != value)
+                {
+                    this._codePostalInvalid2 = value;
+                    OnPropertyChanged("CodePostalInvalid2");
+                }
+            }
+        }
+        public bool PhoneInvalid2
+        {
+            get { return this._phoneInvalid; }
+            set
+            {
+                if (this._phoneInvalid2 != value)
+                {
+                    this._phoneInvalid2 = value;
+                    OnPropertyChanged("PhoneInvalid2");
+                }
+            }
+        }
+        public bool NasInvalid2
+        {
+            get { return this._nasInvalid2; }
+            set
+            {
+                if (this._nasInvalid2 != value)
+                {
+                    this._nasInvalid2 = value;
+                    OnPropertyChanged("NasInvalid2");
+                }
+            }
+        }
+        public bool NamInvalid2
+        {
+            get { return this._namInvalid2; }
+            set
+            {
+                if (this._namInvalid2 != value)
+                {
+                    this._namInvalid2 = value;
+                    OnPropertyChanged("NamInvalid2");
+                }
+            }
+        }
+        public bool SpokenInvalid2
+        {
+            get { return this._spokenInvalid2; }
+            set
+            {
+                if (this._spokenInvalid2 != value)
+                {
+                    this._spokenInvalid2 = value;
+                    OnPropertyChanged("SpokenInvalid2");
+                }
+            }
+        }
+        public bool WrittenInvalid2
+        {
+            get { return this._writtenInvalid2; }
+            set
+            {
+                if (this._writtenInvalid2 != value)
+                {
+                    this._writtenInvalid2 = value;
+                    OnPropertyChanged("WrittenInvalid2");
+                }
+            }
+        }
+        public bool SrcRefInvalid2
+        {
+            get { return this._srcRefInvalid2; }
+            set
+            {
+                if (this._srcRefInvalid2 != value)
+                {
+                    this._srcRefInvalid2 = value;
+                    OnPropertyChanged("SrcRefInvalid2");
+                }
+            }
+        }
+        public bool DdnInvalid2
+        {
+            get { return this._ddnInvalid2; }
+            set
+            {
+                if (this._ddnInvalid2 != value)
+                {
+                    this._ddnInvalid2 = value;
+                    OnPropertyChanged("DdnInvalid2");
+                }
+            }
+        }
+        public string Ddn2
+        {
+            get { return this._ddn2; }
+            set
+            {
+                if (this._ddn2 != value)
+                {
+                    this._ddn2 = value;
+                    OnPropertyChanged("Ddn2");
+                }
+            }
+        }
+        public string FirstName2
+        {
+            get { return this._firstName2; }
+            set
+            {
+                if (this._firstName2 != value)
+                {
+                    this._firstName2 = value;
+                    OnPropertyChanged("FirstName2");
+                }
+            }
+        }
+
+        public string LastName2
+        {
+            get { return this._lastName2; }
+            set
+            {
+                if (this._lastName2 != value)
+                {
+                    this._lastName2 = value;
+                    OnPropertyChanged("LastName2");
+                }
+            }
+        }
+
+        public string Address2
+        {
+            get { return this._address2; }
+            set
+            {
+                if (this._address2 != value)
+                {
+                    this._address2 = value;
+                    OnPropertyChanged("Address2");
+                }
+            }
+        }
+        public string CodePostal2
+        {
+            get { return this._codePostal2; }
+            set
+            {
+                if (this._codePostal2 != value)
+                {
+                    this._codePostal2 = value;
+                    OnPropertyChanged("CodePostal2");
+                }
+            }
+        }
+
+        public string Phone2
+        {
+            get { return this._phone2; }
+            set
+            {
+                if (this._phone2 != value)
+                {
+                    this._phone2 = value;
+                    OnPropertyChanged("Phone2");
+                }
+            }
+        }
+
+        public string Nas2
+        {
+            get { return this._nas2; }
+            set
+            {
+                if (this._nas2 != value)
+                {
+                    this._nas2 = value;
+                    OnPropertyChanged("Nas2");
+                }
+            }
+        }
+        public string Nam2
+        {
+            get { return this._nam2; }
+            set
+            {
+                if (this._nam2 != value)
+                {
+                    this._nam2 = value;
+                    OnPropertyChanged("Nam2");
+                }
+            }
+        }
+
+        public string Spoken2
+        {
+            get { return this._spoken2; }
+            set
+            {
+                if (this._spoken2 != value)
+                {
+                    this._spoken2 = value;
+                    OnPropertyChanged("Spoken2");
+                }
+            }
+        }
+
+        public string Written2
+        {
+            get { return this._written2; }
+            set
+            {
+                if (this._written2 != value)
+                {
+                    this._written2 = value;
+                    OnPropertyChanged("Written2");
+                }
+            }
+        }
+
+
+        public string SrcRef2
+        {
+            get { return this._srcRef2; }
+            set
+            {
+                if (this._srcRef2 != value)
+                {
+                    this._srcRef2 = value;
+                    OnPropertyChanged("SrcRef2");
                 }
             }
         }
