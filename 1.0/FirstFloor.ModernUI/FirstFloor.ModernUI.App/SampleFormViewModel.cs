@@ -14,6 +14,7 @@ namespace FirstFloor.ModernUI.App
     public class SampleFormViewModel
         : NotifyPropertyChanged, IDataErrorInfo
     {
+        private readonly int MaxPage = 4;
         private FormModel _data;
         private string _firstName = "";
         private string _lastName ="";
@@ -29,6 +30,7 @@ namespace FirstFloor.ModernUI.App
 
         private string _user = "";
         private string _invalidPages = "";
+        
         //private string _firstName = "";
         //private string _lastName = "";
         //private string _address = "";
@@ -44,10 +46,11 @@ namespace FirstFloor.ModernUI.App
         private bool _writtenInvalid = false;
         private bool _srcRefInvalid = false;
         private bool _ddnInvalid = false;
-
+        private bool _invalidPagesState = false;
         private int _pageNumber = 1;
         private ICommand _previousCommand, _nextCommand, _saveCommand, _openAdminCommand, _saveAdminCommand, _clearAdminCommand, _validCommand;
-        
+
+
         public ICommand ClearAdminCommand
         {
             get
@@ -152,18 +155,19 @@ namespace FirstFloor.ModernUI.App
             string prefix = @".\";
             if (!admin)
             {
-                User = SingletonUser.user;
+                User = SingletonUser.user.ToString();
             }
             prefix += User;      
             string fileName = prefix + "\\" + PageNumber;
             if (admin)
             {
                 fileName += "original_";
-                SingletonUser.user = User;
-            } else
-            {
-                User = SingletonUser.user;
+                //SingletonUser.user = User;
             }
+            //else
+            //{
+            //    User = SingletonUser.user.ToString();
+            //}
             fileName += ".txt"; 
             System.IO.Directory.CreateDirectory(prefix);
             JsonSerializer serializer = new JsonSerializer();
@@ -184,8 +188,8 @@ namespace FirstFloor.ModernUI.App
         }
         private void Validate()
         {
-            FormModel formOriginal = null, formToCheck;
-            int idx = 1;
+            InvalidPages = "";
+            FormModel formOriginal = null, formToCheck = null;
             string prefix = @".\";
             prefix += User;
             string fileName = prefix + "\\" + PageNumber;
@@ -207,11 +211,13 @@ namespace FirstFloor.ModernUI.App
             }
             if(formOriginal != null)
             {
-                for (int i = 1; i < 67; ++i)
+             
+                for (int i = 1; i < MaxPage; ++i)
                 {
+                    bool errorPresent = false;
                     prefix = @".\";
                     prefix += User;
-                    fileName = prefix + "\\" + PageNumber;
+                    fileName = prefix + "\\" + i;
                     fileName += ".txt";
                     try
                     {
@@ -222,29 +228,84 @@ namespace FirstFloor.ModernUI.App
                             formToCheck = (FormModel)serializer.Deserialize(file, typeof(FormModel));
 
                             formToCheck.addressInvalid = formToCheck.address != formOriginal.address;
+                            errorPresent |= formToCheck.addressInvalid;
                             formToCheck.codePostalInvalid = formToCheck.codePostal != formOriginal.codePostal;
+                            errorPresent |= formToCheck.codePostalInvalid;
                             formToCheck.ddnInvalid = formToCheck.ddn != formOriginal.ddn;
+                            errorPresent |= formToCheck.ddnInvalid;
                             formToCheck.firstNameInvalid = formToCheck.firstName != formOriginal.firstName;
+                            errorPresent |= formToCheck.firstNameInvalid;
                             formToCheck.lastNameInvalid = formToCheck.lastName != formOriginal.lastName;
+                            errorPresent |= formToCheck.lastNameInvalid;
                             formToCheck.namInvalid = formToCheck.nam != formOriginal.nam;
+                            errorPresent |= formToCheck.namInvalid;
                             formToCheck.nasInvalid = formToCheck.nas != formOriginal.nas;
+                            errorPresent |= formToCheck.nasInvalid;
                             formToCheck.phoneInvalid = formToCheck.phone != formOriginal.phone;
+                            errorPresent |= formToCheck.phoneInvalid;
                             formToCheck.spokenInvalid = formToCheck.spoken != formOriginal.spoken;
+                            errorPresent |= formToCheck.spokenInvalid;
                             formToCheck.writtenInvalid = formToCheck.written != formOriginal.written;
+                            errorPresent |= formToCheck.writtenInvalid;
+                            formToCheck.srcRefInvalid = formToCheck.srcRef != formOriginal.srcRef;
+                            errorPresent |= formToCheck.srcRefInvalid;
                         }
 
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
+                        errorPresent = true;
+                    }
+                    if (errorPresent)
+                    {
+                        if(InvalidPages == "")
+                        {
+                            InvalidPages = "Pages : ";
+                        }
+                        if(i < MaxPage-1)
+                        {
+                            InvalidPages += i + " | ";
+                        } else
+                        {
+                            InvalidPages += i;
+                        }
+                        //string pr = @".\";
+                        //pr += User;
+                        //string fn = pr + "\\" + i;
+                        //fn += ".txt";
+                        //System.IO.Directory.CreateDirectory(prefix);
+                        //JsonSerializer serializer2 = new JsonSerializer();
+                        //using (StreamWriter sw = new StreamWriter(fileName))
+                        //using (JsonWriter writer = new JsonTextWriter(sw))
+                        //{
+                        //    serializer2.Serialize(writer, formToCheck);
+                        //}
+                    }
+                    else
+                    {
+                        
+                    }
+                    string pr = @".\";
+                    pr += User;
+                    string fn = pr + "\\" + i;
+                    fn += ".txt";
+                    System.IO.Directory.CreateDirectory(prefix);
+                    JsonSerializer serializer2 = new JsonSerializer();
+                    using (StreamWriter sw = new StreamWriter(fileName))
+                    using (JsonWriter writer = new JsonTextWriter(sw))
+                    {
+                        serializer2.Serialize(writer, formToCheck);
                     }
                 }
             }
             
             
         }
+
         private void GetForm(bool goNext, int pageNo = 0, bool admin = false)
         {
+            InitFields();
             if(pageNo > 0)
             {
                 PageNumber = pageNo;
@@ -253,7 +314,7 @@ namespace FirstFloor.ModernUI.App
             {
                 if (goNext)
                 {
-                    if (PageNumber < 67)
+                    if (PageNumber < MaxPage)
                     {
                         ++PageNumber;
                     }
@@ -270,14 +331,14 @@ namespace FirstFloor.ModernUI.App
             string prefix = @".\";
             if (!admin)
             {
-               User = SingletonUser.user;
+               User = SingletonUser.user.ToString();
             } 
             prefix += User;
             string fileName = prefix + "\\" + PageNumber;
             if (admin)
             {
                 fileName += "original_";
-                SingletonUser.user = User;
+                //SingletonUser.user = User.ToString();
             } 
             fileName += ".txt";
             bool foundForm = false;
@@ -306,7 +367,7 @@ namespace FirstFloor.ModernUI.App
                 }
             }
         }
-        private void InitFields()
+        private void InitFields(bool admin = false)
         {
             bool valueBool = false;
             string valueStr = "";
@@ -321,8 +382,13 @@ namespace FirstFloor.ModernUI.App
             Written = valueStr;
             SrcRef = valueStr;
             Ddn = valueStr;
-            User = valueStr;
-            SingletonUser.user = User;
+            InvalidPages = valueStr;
+            //User = valueStr;
+            //if (admin)
+            //{
+            //    SingletonUser.user = User;
+            //}
+
 
             FirstNameInvalid = valueBool;
             LastNameInvalid = valueBool;
@@ -349,7 +415,7 @@ namespace FirstFloor.ModernUI.App
             Written = form.written;
             SrcRef = form.srcRef;
             Ddn = form.ddn;
-            User = form.user;
+            //User = form.user;
 
             FirstNameInvalid = form.firstNameInvalid;
             LastNameInvalid = form.lastNameInvalid;
@@ -387,6 +453,18 @@ namespace FirstFloor.ModernUI.App
                 }
             }
         }
+        public bool InvalidPagesState
+        {
+            get { return this._invalidPagesState; }
+            set
+            {
+                if (this._invalidPagesState != value)
+                {
+                    this._invalidPagesState = value;
+                    OnPropertyChanged("InvalidPagesState");
+                }
+            }
+        }
         public string User
         {
             get { return this._user; }
@@ -395,6 +473,7 @@ namespace FirstFloor.ModernUI.App
                 if (this._user != value)
                 {
                     this._user = value;
+                    SingletonUser.user = value.ToString();
                     OnPropertyChanged("User");
                 }
             }
