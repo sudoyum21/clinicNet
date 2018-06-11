@@ -14,7 +14,7 @@ namespace FirstFloor.ModernUI.App
     public class SampleFormViewModel
         : NotifyPropertyChanged, IDataErrorInfo
     {
-        private readonly int MaxPage = 4;
+        private readonly int MaxPage = 67;
         private FormModel _data;
         private string _firstName = "";
         private string _lastName ="";
@@ -314,7 +314,7 @@ namespace FirstFloor.ModernUI.App
             {
                 if (goNext)
                 {
-                    if (PageNumber < MaxPage)
+                    if (PageNumber < MaxPage-1)
                     {
                         ++PageNumber;
                     }
