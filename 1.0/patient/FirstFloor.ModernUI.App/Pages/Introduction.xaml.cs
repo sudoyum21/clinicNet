@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace clinic.admin.Pages
+namespace clinic.patient.Pages
 {
     /// <summary>
     /// Interaction logic for Introduction.xaml

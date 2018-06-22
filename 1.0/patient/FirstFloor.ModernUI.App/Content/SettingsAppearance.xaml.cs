@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace FirstFloor.ModernUI.App.Content
+namespace clinic.patient.Content
 {
     /// <summary>
     /// Interaction logic for SettingsAppearance.xaml

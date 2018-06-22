@@ -196,7 +196,7 @@ namespace clinic.admin
             string prefix = @".\";
             prefix += User;
             string fileName = prefix + "\\" + PageNumber;
-            fileName += "original_";      
+            fileName += "original";      
             fileName += ".txt";
             try
             {

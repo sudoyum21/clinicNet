@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace clinic.admin.Content
+namespace clinic.patient.Content
 {
     /// <summary>
     /// Interaction logic for LoremIpsumSplit.xaml
