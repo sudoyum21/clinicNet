@@ -327,12 +327,40 @@
                     </StackPanel>
                     <Button Content="Valider" Margin="100,16,0,0" HorizontalAlignment="Left" Command="{Binding Path=ValidateCommand}" Width="150"/>
                     <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                        <Label Content="{Binding InvalidPages, Mode=TwoWay}" Margin="100,16,0,0" >
+                        <ScrollViewer.Resources>
+                            <DataTemplate DataType="{x:Type app:LinkText}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock>
+                                        <TextBlock Text="{Binding Text}" Margin="1" />
+                                        <Hyperlink Command="{Binding HyperlinkCommand}">
+                                            <TextBlock Text="{Binding Hyperlink}" Margin="1" />
+                                        </Hyperlink>
+                                    </TextBlock>
+                                    <!-- the other controls with bindings -->
+                                </StackPanel>
+                            </DataTemplate>
+                        </ScrollViewer.Resources>
+                        <StackPanel CanHorizontallyScroll="True" Orientation="Horizontal">
+                            <ListBox ItemsSource="{Binding LinkItems}"  >
+                                <ListBox.ItemsPanel>
+
+                                    <ItemsPanelTemplate>
+
+                                        <StackPanel Orientation="Horizontal"/>
+
+                                    </ItemsPanelTemplate>
+
+                                </ListBox.ItemsPanel>
+                            </ListBox>
+                        </StackPanel>
+                        
+                        
+                        <!--<Label Content="{Binding InvalidPages, Mode=TwoWay}" Margin="100,16,0,0" >
                             <Label.Style>
                                 <Style TargetType="Label">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding InvalidPagesState}" Value="false">
-                                            <!--<Setter Property="Bo" Value="White"/>-->
+                                            --><!--<Setter Property="Bo" Value="White"/>--><!--
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding InvalidPagesState}" Value="true">
                                             <Setter Property="FontWeight" Value="bold"/>
@@ -341,7 +369,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </Label.Style>
-                        </Label>
+                        </Label>-->
                     </ScrollViewer>
                 </StackPanel>              
                 <Label Content="By Unblank" FontStyle="Italic" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75"/>

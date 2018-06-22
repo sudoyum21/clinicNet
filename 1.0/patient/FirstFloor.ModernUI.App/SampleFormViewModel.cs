@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace clinic.patient
         private readonly int MaxPage = 67;
         private FormModel _data;
         private FormModel _data2;
+
         private string _firstName = "";
         private string _lastName = "";
         private string _address = "";
@@ -75,6 +77,7 @@ namespace clinic.patient
 
         private int _pageNumber = 1;
         private ICommand _previousCommand, _nextCommand, _saveCommand, _openAdminCommand, _saveAdminCommand, _clearAdminCommand, _validCommand;
+        private ObservableCollection<LinkText> _linkItems;
         private readonly string OriginalName = "original";
 
         public ICommand ClearAdminCommand
@@ -178,9 +181,25 @@ namespace clinic.patient
         {
             _data = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
             _data2 = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
+            _linkItems = new ObservableCollection<LinkText>();
+            TestLinkInvalid();
             //Mediator.Register("InitOther", InitOther);
             //Mediator.Register("Next", GoNextAll);
             //Mediator.Register("Back", GoBackAll);
+        }
+        private void TestLinkInvalid()
+        {
+            for(int i = 0; i < 10; ++i)
+            {
+                if(i == 0)
+                {
+                    LinkItems.Add(new LinkText("", i + "", this));
+                } else
+                {
+                    LinkItems.Add(new LinkText("|", i + "", this));
+                }
+                
+            }
         }
         public void InitOther(object args)
         {
@@ -258,7 +277,14 @@ namespace clinic.patient
                 serializer.Serialize(writer, data);
             }
         }
-
+        public void GoNext(int page)
+        {
+            if (!String.IsNullOrEmpty(SingletonUser.user))
+            {
+                GetForm(false, false, page);
+                GetForm(false, true, page);
+            }
+        }
         private void GoBack()
         {
             if (!String.IsNullOrEmpty(SingletonUser.user))
@@ -354,6 +380,14 @@ namespace clinic.patient
                             InvalidPages = "Pages : ";
                         }
                         InvalidPages += i + " | ";
+                        if (i == 0)
+                        {
+                            LinkItems.Add(new LinkText("", i + "", this));
+                        }
+                        else
+                        {
+                            LinkItems.Add(new LinkText("|", i + "", this));
+                        }                        
                     }
                     else
                     {
@@ -1176,6 +1210,18 @@ namespace clinic.patient
                     return string.IsNullOrEmpty(this._user) ? "Required value" : null;
                 }
                 return null;
+            }
+        }
+        public ObservableCollection<LinkText> LinkItems
+        {
+            get
+            {
+                return _linkItems;
+            }
+            set
+            {
+                this._linkItems = value;
+                OnPropertyChanged("LinkItems");
             }
         }
         public class FormModel
