@@ -15,7 +15,7 @@ namespace clinic.patient
     public class SampleFormViewModel
         : NotifyPropertyChanged, IDataErrorInfo
     {
-        private readonly int MaxPage = 67;
+        private int MaxPage = 1;
         private FormModel _data;
         private FormModel _data2;
 
@@ -33,6 +33,7 @@ namespace clinic.patient
 
         private string _user = "";
         private string _invalidPages = "";
+        private string _errorToolTip = "";
 
         private string _firstName2 = "";
         private string _lastName2 = "";
@@ -280,7 +281,7 @@ namespace clinic.patient
         }
         public void GoNext(int page)
         {
-            if (!String.IsNullOrEmpty(SingletonUser.user))
+            if (!String.IsNullOrEmpty(SingletonUser.user) && !TestNotStarted)
             {
                 GetForm(false, false, page);
                 GetForm(false, true, page);
@@ -288,7 +289,7 @@ namespace clinic.patient
         }
         private void GoBack()
         {
-            if (!String.IsNullOrEmpty(SingletonUser.user))
+            if (!String.IsNullOrEmpty(SingletonUser.user) && !TestNotStarted)
             {
                 SaveForm();
                 GetForm(false);
@@ -297,7 +298,7 @@ namespace clinic.patient
         }
         private void GoNext()
         {
-            if (!String.IsNullOrEmpty(SingletonUser.user))
+            if (!String.IsNullOrEmpty(SingletonUser.user) && !TestNotStarted)
             {
                 SaveForm();
                 GetForm(true);
@@ -308,7 +309,7 @@ namespace clinic.patient
         {
             InvalidPages = "";
             LinkItems = new ObservableCollection<LinkText>();
-            for (int i = 1; i < MaxPage; ++i)
+            for (int i = 1; i <= MaxPage; ++i)
             {
                 FormModel formOriginal = null, formToCheck = null;
                 string prefix = @".\";
@@ -382,7 +383,7 @@ namespace clinic.patient
                             InvalidPages = "Pages : ";
                         }
                         InvalidPages += i + " | ";
-                        if (i == 0)
+                        if (LinkItems.Count == 0)
                         {
                             LinkItems.Add(new LinkText("", i + "", this));
                         }
@@ -426,7 +427,7 @@ namespace clinic.patient
             {
                 if (goNext)
                 {
-                    if (PageNumber < MaxPage - 1)
+                    if (PageNumber < MaxPage)
                     {
                         ++PageNumber;
                     }
@@ -476,10 +477,21 @@ namespace clinic.patient
                 if (!foundForm)
                 {
                     InitFields();
+                    if (admin)
+                    {
+                        ErrorTooltip = "# Dossier non trouvé";
+                    }
                 }
-                else
+                else if (admin)
                 {
                     TestNotStarted = false;
+                    ErrorTooltip = "";
+                    string [] currentFiles = Directory.GetFiles(prefix, "*original.txt");
+                    string lastFile = currentFiles[currentFiles.Length - 1];
+                    string subLastFile = lastFile.Substring(prefix.Length+1);
+                    int res;
+                    int.TryParse(subLastFile[0].ToString(), out res);
+                    MaxPage = res;
                 }
             }
         }
@@ -622,6 +634,19 @@ namespace clinic.patient
                 }
             }
         }
+        public string ErrorTooltip
+        {
+            get { return this._errorToolTip; }
+            set
+            {
+                if (this._errorToolTip != value)
+                {
+                    this._errorToolTip = value;
+                    OnPropertyChanged("ErrorTooltip");
+                }
+            }
+        }
+        
         public string InvalidPages
         {
             get { return this._invalidPages; }
@@ -1208,9 +1233,11 @@ namespace clinic.patient
         }
         public string Error
         {
-            get { return null; }
+            get
+            {
+                return this[string.Empty];
+            }
         }
-
         public string this[string columnName]
         {
             get
@@ -1225,7 +1252,7 @@ namespace clinic.patient
                 //}
                 if (columnName == "User")
                 {
-                    return string.IsNullOrEmpty(this._user) ? "Required value" : null;
+                   return string.IsNullOrEmpty(this._user) ? "Veuillez ouvrir un # dossier" : null;
                 }
                 return null;
             }

@@ -39,7 +39,19 @@
                     </StackPanel.Resources>
                     <StackPanel>
                         <Label Content="Dossier No : " Target="{Binding ElementName=User}"/>
-                        <TextBox x:Name="User" Width="150" Text="{Binding User, Mode=TwoWay, ValidatesOnDataErrors=True}" />
+                        <TextBox x:Name="User" Width="150" Text="{Binding User, Mode=TwoWay, ValidatesOnDataErrors=True}" >
+                            <TextBox.Style>
+                                <Style TargetType="{x:Type TextBox}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Validation.HasError" Value="true">
+                                            <Setter Property="ToolTip"
+                Value="{Binding RelativeSource={RelativeSource Self}, 
+                       Path=(Validation.Errors)[0].ErrorContent}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
                         <Button Content="Ouvrir" Margin="45,0,0,0" HorizontalAlignment="Left" Command="{Binding Path=OpenAdminCommand}" Width="150"/>
                     </StackPanel>
                     <StackPanel>

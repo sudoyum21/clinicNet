@@ -49,7 +49,7 @@
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding FirstNameInvalid}"
+                                        <DataTrigger Binding="{Binding LastNameInvalid}"
                                  Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
@@ -59,7 +59,7 @@
                             </TextBox.Style>
                         </TextBox>
                         <!--<RadioButton Margin="8,0,0,0" Command="{Binding Path=InvalidCommand}" CommandParameter="firstname" />-->
-                        <CheckBox Margin="8,0,0,0" IsChecked="{Binding FirstNameInvalid, Mode=TwoWay}" />
+                        <CheckBox Margin="8,0,0,0" IsChecked="{Binding LastName, Mode=TwoWay}" />
                     </StackPanel>
                     <StackPanel>
                         <Label Content="Prenom" Target="{Binding ElementName=TextFirstName}"/>
@@ -67,7 +67,7 @@
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding LastNameInvalid}" Value="True">
+                                        <DataTrigger Binding="{Binding FirstNameInvalid}" Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                             <Setter Property="Background" Value="Red" />
                                         </DataTrigger>
@@ -76,7 +76,7 @@
                             </TextBox.Style>
                         </TextBox>
                         <!--<RadioButton Margin="8,0,0,0" Command="{Binding Path=InvalidCommand}" CommandParameter="firstname" />-->
-                        <CheckBox Margin="8,0,0,0" IsChecked="{Binding LastNameInvalid, Mode=TwoWay}" />
+                        <CheckBox Margin="8,0,0,0" IsChecked="{Binding FirstNameInvalid, Mode=TwoWay}" />
                     </StackPanel>
                     <StackPanel>
                         <Label Content="Addresse" Target="{Binding ElementName=Address}"/>
@@ -264,12 +264,28 @@
                     </StackPanel.Resources>
                     <StackPanel>
                         <Label Content="Dossier No : " Target="{Binding ElementName=User}"/>
-                        <TextBox x:Name="User" Width="150" Text="{Binding User, Mode=TwoWay }" IsEnabled="{Binding Path=TestNotStarted}" />
-                        <Button Content="Ouvrir" Margin="45,0,0,0" HorizontalAlignment="Left" Command="{Binding Path=OpenAdminCommand}" Width="150" IsEnabled="{Binding Path=TestNotStarted}"/>
+                        <TextBox x:Name="User" Width="150" Text="{Binding User, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=TestNotStarted}" >
+                            <TextBox.Style>
+                                <Style TargetType="{x:Type TextBox}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Validation.HasError" Value="true">
+                                            <Setter Property="ToolTip"
+                                            Value="{Binding RelativeSource={RelativeSource Self}, 
+                                                   Path=(Validation.Errors)[0].ErrorContent}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                        <Button Content="Ouvrir" Margin="45,0,0,0" HorizontalAlignment="Left" Command="{Binding Path=OpenAdminCommand}" Width="150" IsEnabled="{Binding Path=TestNotStarted}">
+                        </Button>
+                    
                     </StackPanel>
                     <StackPanel>
                         <Label Content="Page No : " Target="{Binding ElementName=TextPageNumber2}"/>
                         <TextBlock Text="{Binding PageNumber, Mode=TwoWay}" Style="{StaticResource Heading2}" x:Name="TextPageNumber2" Margin="0,0,0,8" />
+                        <Label Content="{Binding ErrorTooltip}" Margin="188,0,0,0" Foreground="Red" Width="Auto">
+                        </Label>
                     </StackPanel>
                     <StackPanel>
                         <Label Content="Nom" Target="{Binding ElementName=TextLastName2}"/>

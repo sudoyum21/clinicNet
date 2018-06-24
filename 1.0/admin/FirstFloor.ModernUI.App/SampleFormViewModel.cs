@@ -158,7 +158,7 @@ namespace clinic.admin
             string fileName = prefix + "\\" + PageNumber;
             if (admin)
             {
-                fileName += "original_";
+                fileName += "original";
                 SingletonUser.user = User;
             } else
             {
@@ -693,7 +693,7 @@ namespace clinic.admin
                 //}
                 if (columnName == "User")
                 {
-                    return string.IsNullOrEmpty(this._user) ? "Required value" : null;
+                    return string.IsNullOrEmpty(this._user) ? "Veuillez entrez le # dossier pour ouvrir un dossier existant ou bien pour créer un nouveau en appuyant sur prochain." : null;
                 }                
                 return null;
             }
