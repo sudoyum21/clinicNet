@@ -264,8 +264,8 @@
                     </StackPanel.Resources>
                     <StackPanel>
                         <Label Content="Dossier No : " Target="{Binding ElementName=User}"/>
-                        <TextBox x:Name="User" Width="150" Text="{Binding User, Mode=TwoWay }" IsEnabled="True" />
-                        <Button Content="Ouvrir" Margin="45,0,0,0" HorizontalAlignment="Left" Command="{Binding Path=OpenAdminCommand}" Width="150"/>
+                        <TextBox x:Name="User" Width="150" Text="{Binding User, Mode=TwoWay }" IsEnabled="{Binding Path=TestNotStarted}" />
+                        <Button Content="Ouvrir" Margin="45,0,0,0" HorizontalAlignment="Left" Command="{Binding Path=OpenAdminCommand}" Width="150" IsEnabled="{Binding Path=TestNotStarted}"/>
                     </StackPanel>
                     <StackPanel>
                         <Label Content="Page No : " Target="{Binding ElementName=TextPageNumber2}"/>

@@ -75,6 +75,7 @@ namespace clinic.patient
         private bool _srcRefInvalid2 = false;
         private bool _ddnInvalid2 = false;
 
+        private bool _testNotStarted = true;
         private int _pageNumber = 1;
         private ICommand _previousCommand, _nextCommand, _saveCommand, _openAdminCommand, _saveAdminCommand, _clearAdminCommand, _validCommand;
         private ObservableCollection<LinkText> _linkItems;
@@ -182,7 +183,7 @@ namespace clinic.patient
             _data = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
             _data2 = new FormModel(LastName, FirstName, Address, CodePostal, Phone, Nas, Nam, Spoken, Written, SrcRef, Ddn, User);
             _linkItems = new ObservableCollection<LinkText>();
-            TestLinkInvalid();
+            //TestLinkInvalid();
             //Mediator.Register("InitOther", InitOther);
             //Mediator.Register("Next", GoNextAll);
             //Mediator.Register("Back", GoBackAll);
@@ -306,6 +307,7 @@ namespace clinic.patient
         private void Validate()
         {
             InvalidPages = "";
+            LinkItems = new ObservableCollection<LinkText>();
             for (int i = 1; i < MaxPage; ++i)
             {
                 FormModel formOriginal = null, formToCheck = null;
@@ -475,6 +477,10 @@ namespace clinic.patient
                 {
                     InitFields();
                 }
+                else
+                {
+                    TestNotStarted = false;
+                }
             }
         }
         private void InitFields(bool admin = false)
@@ -591,6 +597,18 @@ namespace clinic.patient
                 DdnInvalid = form.ddnInvalid;
             }
 
+        }
+        public bool TestNotStarted
+        {
+            get { return this._testNotStarted;  }
+            set
+            {
+                if (this._testNotStarted)
+                {
+                    this._testNotStarted = value;
+                    OnPropertyChanged("TestNotStarted");
+                }
+            }
         }
         public int PageNumber
         {
