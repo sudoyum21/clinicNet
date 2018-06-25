@@ -280,7 +280,7 @@ namespace clinic.admin
             string fileName = prefix + "\\" + PageNumber;
             if (admin)
             {
-                fileName += "original_";
+                fileName += "original";
                 SingletonUser.user = User;
             } 
             fileName += ".txt";
